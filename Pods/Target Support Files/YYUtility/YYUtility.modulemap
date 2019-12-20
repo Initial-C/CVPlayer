@@ -1,0 +1,6 @@
+framework module YYUtility {
+  umbrella header "YYUtility-umbrella.h"
+
+  export *
+  module * { export * }
+}
