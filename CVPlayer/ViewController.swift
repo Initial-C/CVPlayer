@@ -18,6 +18,7 @@ class ViewController: UIBaseViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var tableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "庆余年"
         tableView.tableFooterView = UIView()
         tableView.sectionFooterHeight = 0.0
         tableView.scrollIndicatorInsets = tableView.contentInset

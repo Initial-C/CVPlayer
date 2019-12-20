@@ -21,6 +21,8 @@ let idNumber = UIDevice.current.identifierForVendor?.uuidString //设备udid
 typealias CModelProtocol = ObjectMapper.Mappable
 typealias CMMappable = ObjectMapper.ImmutableMappable
 typealias CMapper = ObjectMapper.Mapper
+// path
+let kDocumentFolder = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true).first!
 // font
 let kSemiboldFont = "PingFangSC-Semibold"
 let kMediumFont = "PingFangSC-Medium"

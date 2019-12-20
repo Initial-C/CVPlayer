@@ -9,6 +9,7 @@
 import UIKit
 import SnapKit
 import SVProgressHUD
+import MediaPlayer
 import UIColor_Hex_Swift
 
 protocol MTPlayerViewDelegate : NSObjectProtocol {
@@ -21,11 +22,20 @@ protocol MTPlayerViewDelegate : NSObjectProtocol {
     func playerViewQualityAction(_ qualityIdentifierStr : String) -> Void
     func playerViewLastDragAction(_ seekValue : Float) -> Void
     func playerViewShowMenuAction(_ isShowMenu : Bool) -> Void
+    func playerViewReplayAction(_ playerV : MTPlayerView) -> Void
+    func playerViewCurrentPlay(_ index : Int) -> Void
 }
 let MTVideoQualityStrs = ["ld", "sd", "hd"]
+let MTVideoRates = ["1.0x", "1.25x", "1.5x", "2.0x"]
 class MTPlayerView: UIView {
     weak var delegate : MTPlayerViewDelegate?
     fileprivate lazy var contentView : UIView = {
+        let content = UIView()
+        content.backgroundColor = .black
+        content.clipsToBounds = true
+        return content
+    }()
+    lazy var videoContainerView : UIView = {
         let content = UIView()
         content.backgroundColor = UIColor.init("#ffcc00")
         content.clipsToBounds = true
@@ -35,6 +45,15 @@ class MTPlayerView: UIView {
         let hud = MTSmartHUDView()
         return hud
     }()
+    // MARK: Control Gesture
+    fileprivate var controlPan : UIPanGestureRecognizer!
+    fileprivate var control_leftArea_Y : CGFloat = 0.0
+    fileprivate var control_RightArea_Y : CGFloat = 0.0
+    fileprivate var control_Area_X : CGFloat = 0.0
+    fileprivate var isPanSeeking : Bool = false
+    fileprivate var controlLRWidth : CGFloat {
+        return isFullScreen ? kZWScreenH*0.5 : kZWScreenW*0.5
+    }
     // MARK: AudioView
     fileprivate lazy var audioView : UIView = {
         let audioV = UIView()
@@ -67,9 +86,34 @@ class MTPlayerView: UIView {
             }
         }
     }
+    // MARK: Replay View
+    fileprivate lazy var replayContainer : UIView = {
+        let replayV = UIView()
+        replayV.backgroundColor = .black
+        replayV.addSubview(replayBtn)
+        replayV.isHidden = true
+        let tap = UITapGestureRecognizer.init(target: self, action: nil)
+        replayV.addGestureRecognizer(tap)
+        return replayV
+    }()
+    fileprivate lazy var replayBtn : UIButton = {
+        let btn = UIButton(type: .custom)
+        btn.setTitle("重新播放", for: .normal)
+        btn.setImage(UIImage(named: "icon_player_cxbf"), for: .normal)
+        btn.titleLabel?.font = UIFont(name: kRegularFont, size: 18)
+        btn.layer.borderColor = UIColor.white.cgColor
+        btn.layer.borderWidth = 1.0
+        btn.layer.cornerRadius = 20
+        btn.layer.masksToBounds = true
+        btn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: 0)
+        btn.adjustsImageWhenHighlighted = false
+        btn.addTarget(self, action: #selector(actionReplay(_:)), for: .touchUpInside)
+        return btn
+    }()
     // MARK: bottom
     fileprivate lazy var bottomBackImV : UIImageView = {
         let imv = UIImageView.init(image: UIImage(named: "bg_player_gradient_below"))
+        imv.isHidden = true
         return imv
     }()
     fileprivate lazy var timeLb : UILabel = {
@@ -86,7 +130,7 @@ class MTPlayerView: UIView {
         let progressV = UIProgressView()
         progressV.trackTintColor = UIColor.white.withAlphaComponent(0.3)
         progressV.progressTintColor = UIColor.init("#d2d2d2").withAlphaComponent(0.3)
-        progressV.transform = CGAffineTransform.init(scaleX: 1.0, y: 1.5)
+//        progressV.transform = CGAffineTransform.init(scaleX: 1.0, y: 1.5)
         return progressV
     }()
     fileprivate lazy var progressSlider : MTSmartSlider = {
@@ -158,6 +202,7 @@ class MTPlayerView: UIView {
     fileprivate lazy var topBackImV : UIImageView = {
         let imv = UIImageView.init(image: UIImage(named: "bg_player_gradient_above"))
         imv.image?.resizableImage(withCapInsets: UIEdgeInsets.init(top: 5, left: 0.3, bottom: 5, right: 0.3))
+        imv.isHidden = true
         return imv
     }()
     fileprivate lazy var topView : UIView = {
@@ -189,7 +234,7 @@ class MTPlayerView: UIView {
     }()
     fileprivate lazy var titleLb : UILabel = {
         let lb = UILabel()
-        lb.text = "视频标题"
+        lb.text = "庆余年"
         lb.textColor = .white
         lb.font = UIFont(name: kMediumFont, size: 15)
         lb.isHidden = true
@@ -224,7 +269,7 @@ class MTPlayerView: UIView {
     }()
     fileprivate lazy var rateMenu : UIView = {
         let menu = UIView()
-        let btnNames = ["1.0x", "1.25x", "1.5x", "2.0x"]
+        let btnNames = MTVideoRates
         let oriY : CGFloat = (kZWScreenW - 210) * 0.5
         let margin : CGFloat = 30
         btnNames.enumerated().forEach({ (i, str) in
@@ -242,6 +287,9 @@ class MTPlayerView: UIView {
         return menu
     }()
     // MARK: 公开api
+    var isHUDLoading : Bool {
+        return !hudView.isInteractionEnabled
+    }
     /// 是否切换到音频
     var isShowAudioView : Bool = false {
         didSet {
@@ -257,6 +305,13 @@ class MTPlayerView: UIView {
     var isShowCoverView : Bool = false {
         didSet {
             coverImageView.isHidden = !isShowCoverView
+            controlPan.isEnabled = !isShowCoverView
+            if isShowCoverView {
+                isCancelHideMenu = true
+            } else {
+                isCancelHideMenu = false
+                delayHideMenus()
+            }
         }
     }
     /// 设置全屏
@@ -264,7 +319,7 @@ class MTPlayerView: UIView {
         didSet {
             fullScreenBtn.isHidden = isFullScreen
             rateBtn.isHidden = !isFullScreen
-            qualityBtn.isHidden = rateBtn.isHidden
+            qualityBtn.isHidden = true//rateBtn.isHidden
             _ = isFullScreen ? bufferRightConst.deactivate() : bufferRightConst.activate()
             _ = isFullScreen ? bufferFullScreenRConst.activate() : bufferFullScreenRConst.deactivate()
             contentView.snp.updateConstraints { (make) in
@@ -281,7 +336,9 @@ class MTPlayerView: UIView {
             backBtn.snp.updateConstraints { (make) in
                 make.top.equalToSuperview().offset(isFullScreen && !isShowMenu ? -52 : 12)
             }
-            titleLb.isHidden = !isFullScreen
+            backBtn.isHidden = !isFullScreen
+//            moreBtn.isHidden = isFullScreen
+//            titleLb.isHidden = !isFullScreen
         }
     }
     // 设置倍速 0~3
@@ -320,7 +377,14 @@ class MTPlayerView: UIView {
             progressSlider.value = Float(progress)
         }
     }
+    /// 是否显示重播
+    var isShowReplayView : Bool = false {
+        didSet {
+            replayContainer.isHidden = !isShowReplayView
+        }
+    }
     // MARK: 私有api
+    fileprivate var totalTime : TimeInterval = 0.0
     /// 最后一次滑动位置
     fileprivate var lastMarkedSeconds : Int = 0
     /// 是否正在拖动
@@ -336,27 +400,85 @@ class MTPlayerView: UIView {
         }
     }
     /// 是否取消自动隐藏菜单
-    fileprivate var isCancleHideMenu : Bool = false
+    fileprivate var isCancelHideMenu : Bool = false
+    /// 音量
+    fileprivate var volumeSlider : UISlider? {
+        get {
+            var vS : UISlider?
+            volumeView.subviews.forEach { (view) in
+                let cName = view.className()
+                if cName == "MPVolumeSlider" {
+                    vS = (view as! UISlider)
+                }
+            }
+            return vS
+        }
+    }
+    fileprivate lazy var volumeView : MPVolumeView = {
+        let vV = MPVolumeView()
+        vV.isHidden = true
+        self.window?.addSubview(vV)
+        return vV
+    }()
+    fileprivate var initialVolume : Float = 0.0
+    fileprivate var appVolume : Float = 0.0 {
+        didSet {
+            if let vS = self.volumeSlider {
+                self.volumeView.showsVolumeSlider = true
+                vS.setValue(appVolume, animated: false)
+                vS.sendActions(for: UIControl.Event.touchUpInside)
+                self.volumeView.sizeToFit()
+            }
+        }
+    }
+    // MARK: player
+    var player : AliListPlayer!
+    var currentTime : TimeInterval {
+        return TimeInterval(player.currentPosition / 1000)
+    }
+    var duration : TimeInterval {
+        return TimeInterval(player.duration / 1000)
+    }
+    var isPlaying : Bool {
+        return playerState == AVPStatusStarted
+    }
+    var playerState : AVPStatus = AVPStatusIdle
+    var curProgress : Float {
+        return Float(player.currentPosition / player.duration)
+    }
+    fileprivate lazy var models = [CModel]()
+    fileprivate var curModel : CModel!
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .black
         self.clipsToBounds = true
+        // gesture
         let menuTap = UITapGestureRecognizer.init(target: self, action: #selector(tapMenus))
+        let doubleTap = UITapGestureRecognizer.init(target: self, action: #selector(actionPlayOrPause))
+        doubleTap.numberOfTapsRequired = 2
+        menuTap.require(toFail: doubleTap)
         self.addGestureRecognizer(menuTap)
+        self.addGestureRecognizer(doubleTap)
+        controlPan = UIPanGestureRecognizer.init(target: self, action: #selector(actionControlWithPan(_:)))
+        self.addGestureRecognizer(controlPan)
         addSubview(contentView)
-        addSubview(hudView)
+        contentView.addSubview(videoContainerView)
         contentView.addSubview(audioView)
         contentView.addSubview(bottomView)
         contentView.addSubview(halfBoard)
         contentView.addSubview(topView)
         contentView.addSubview(coverImageView)
-        contentView.addSubview(backBtn)
         contentView.addSubview(moreBtn)
+        contentView.addSubview(replayContainer)
+        contentView.addSubview(hudView)
+        contentView.addSubview(backBtn)
         contentView.addSubview(titleLb)
         setupLayout()
         setupSlider()
         //
+        hudView.isVisableHUD = true
         delayHideMenus()
+        syncSystemVolume()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -372,10 +494,15 @@ class MTPlayerView: UIView {
     }
     
     private func setupLayout() {
+        contentView.snp.makeConstraints { (make) in
+            make.top.bottom.equalToSuperview()
+            make.left.equalTo(0)
+            make.right.equalTo(0)
+        }
         hudView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
-        contentView.snp.makeConstraints { (make) in
+        videoContainerView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
         // audio snp
@@ -419,7 +546,7 @@ class MTPlayerView: UIView {
         bufferProgressView.snp.makeConstraints { (make) in
             make.left.equalTo(timeLb.snp.right).offset(8)
             bufferRightConst = make.right.equalToSuperview().offset(-68).priority(.high).constraint
-            bufferFullScreenRConst = make.right.equalTo(qualityBtn.snp.left).offset(-8).priority(.medium).constraint
+            bufferFullScreenRConst = make.right.equalTo(rateBtn.snp.left).offset(-8).priority(.medium).constraint
             bufferFullScreenRConst.deactivate()
             make.height.equalTo(2)
             make.centerY.equalToSuperview()
@@ -472,6 +599,14 @@ class MTPlayerView: UIView {
             make.left.equalTo(backBtn.snp.right).offset(10)
             make.centerY.equalTo(backBtn)
         }
+        // replay snp
+        replayContainer.snp.makeConstraints { (make) in
+            make.edges.equalToSuperview()
+        }
+        replayBtn.snp.makeConstraints { (make) in
+            make.center.equalToSuperview()
+            make.size.equalTo(CGSize(width: 130, height: 40))
+        }
         // cover snp
         coverImageView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
@@ -486,21 +621,29 @@ class MTPlayerView: UIView {
         let sliderTap = UITapGestureRecognizer.init(target: self, action: #selector(tapSliderAction(_:)))
         progressSlider.addGestureRecognizer(sliderTap)
     }
-    //TODO: 滑动
+    // 音量同步
+    private func syncSystemVolume() {
+        initialVolume = AVAudioSession.sharedInstance().outputVolume
+        if let vS = volumeSlider, vS.value > 0 {
+            initialVolume = vS.value
+        }
+    }
+
+}
+// MARK: - slider
+extension MTPlayerView {
     @objc fileprivate func changeProgress(_ slider : UISlider) {
         seekingHandler(slider.value)
     }
     @objc fileprivate func progressSliderTouchBegan(_ slider : UISlider) {
-        isDraging = true // 用于监听判断
-        isCancleHideMenu = true
-        appearMenus(true)
+        sliderTouchBegan(slider)
     }
     @objc fileprivate func progressSliderValueChanged(_ slider : UISlider) {
-        sliderTouchBegan()
+        sliderTouchChanging()
     }
     @objc fileprivate func progressSliderTouchEnded(_ slider : UISlider) {
-        seekingHandler(slider.value)
         sliderTouchEnded()
+        seekingHandler(slider.value)
     }
     @objc fileprivate func tapSliderAction(_ tap : UITapGestureRecognizer) {
         if let tapView = tap.view, tapView.isKind(of: MTSmartSlider.self) {
@@ -513,23 +656,38 @@ class MTPlayerView: UIView {
         }
     }
     fileprivate func seekingHandler(_ value : Float) {
+        seekToTime(Int(Float(duration) * value))
         if let delegate = delegate {
             delegate.playerViewSeekAction(value)
         }
+        hudView.showLoadingHUD()
     }
     fileprivate func sliderTouchEnded() {
+        hudView.hide()
         isDraging = false
         if let delegate = delegate {
             delegate.playerViewLastDragAction(progressSlider.value)
         }
-        delayHideMenus()
-        hudView.hide()
+        if !isPlaying {
+            player.start()
+        }
+        if isFullScreen {
+            delayHideMenus()
+        }
     }
-    fileprivate func sliderTouchBegan() {
-        hudView.showSeekingHUD(progressSlider.value, second: 320) // TODO: 同步进度时间
+    fileprivate func sliderTouchBegan(_ slider : UISlider?) {
+        isDraging = true // 用于监听判断
+        if slider != nil || isFullScreen  {
+            isCancelHideMenu = true
+            appearMenus(true)
+        } else {
+            appearMenus(false)
+        }
+    }
+    fileprivate func sliderTouchChanging() {
+        hudView.showSeekingHUD(progressSlider.value, second: totalTime) // TODO: 同步进度时间
     }
     
-
 }
 // MARK: logic
 extension MTPlayerView {
@@ -540,18 +698,19 @@ extension MTPlayerView {
             actionShowHalfBoard(nil)
             return
         }
-        isCancleHideMenu = false
+        isCancelHideMenu = false
         appearMenus(!isShowMenu)
     }
     // 显示/隐藏菜单
     @objc fileprivate func autoHideMenus() {
-        print("隐藏")
+//        print("隐藏")
         appearMenus(false)
     }
     @objc fileprivate func cancelAutoHideMenus() {
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(autoHideMenus), object: nil)
     }
     @objc fileprivate func delayHideMenus() {
+        cancelAutoHideMenus()
         perform(#selector(autoHideMenus), afterDelay: 5.0)
     }
     @objc fileprivate func appearMenus(_ isShow : Bool) {
@@ -560,19 +719,23 @@ extension MTPlayerView {
         //
         if isShow == isShowMenu {
             isShowMenu = isShow
-            if isShow && !isCancleHideMenu {
-                delayHideMenus()
+            if isShow {
+                if isCancelHideMenu {
+                    isCancelHideMenu = false
+                } else {
+                    delayHideMenus()
+                }
             }
             return
         }
         if isShow {
-            if isCancleHideMenu { // 取消自动隐藏
-                isCancleHideMenu = false
+            if isCancelHideMenu { // 取消自动隐藏
+                isCancelHideMenu = false
             } else {
                 delayHideMenus()
             }
         } else {
-            if isCancleHideMenu { return }
+            if isCancelHideMenu { return }
         }
         UIView.animate(withDuration: 0.15) {
             self.bottomView.snp.updateConstraints({ (make) in
@@ -590,11 +753,87 @@ extension MTPlayerView {
         }
         isShowMenu = isShow
     }
+    /// 手势控制
+    @objc fileprivate func actionControlWithPan(_ panGesture : UIPanGestureRecognizer) {
+        if isHUDLoading { return }
+        guard let gestureV = panGesture.view else { return }
+        switch panGesture.state {
+        case .began:
+            control_leftArea_Y = panGesture.location(in: gestureV).y
+            control_RightArea_Y = panGesture.location(in: gestureV).y
+            control_Area_X = panGesture.location(in: gestureV).x
+            syncSystemVolume()
+            break
+        case .changed:
+            let translationP = panGesture.translation(in: self)
+            let absX = fabsf(Float(translationP.x))
+            let absY = fabsf(Float(translationP.y))
+            if max(absX, absY) < 10 { return } // 忽略滑动距离过小
+            if absX > absY {    // horizontal
+                isPanSeeking = true
+                sliderTouchBegan(nil)
+                let curX = panGesture.location(in: gestureV).x
+                let ratio = (curX - control_Area_X) / (isFullScreen ? kZWScreenH : kZWScreenW) * 0.5
+                progressSlider.value += (progressSlider.maximumValue - progressSlider.minimumValue) * Float(ratio)
+                sliderTouchChanging()
+                control_Area_X = curX
+            } else if absY > absX { // vertical
+                let curPointY = panGesture.location(in: gestureV).y
+                if control_Area_X < controlLRWidth { // 左边控制亮度
+                    isPanSeeking = false
+                    let ratio = (control_leftArea_Y - curPointY) / gestureV.frame.height
+                    let curBrightness = UIScreen.main.brightness + ratio
+                    hudView.showBrightNess(Float(curBrightness))
+//                    print("MT Current play brightness == \(Float(curBrightness))")
+                    control_leftArea_Y = curPointY
+                } else if control_Area_X > controlLRWidth  { // 右边控制音量
+                    isPanSeeking = false
+                    let ratio = (control_RightArea_Y - curPointY) / gestureV.frame.height
+                    initialVolume += Float(ratio)
+                    initialVolume = min(initialVolume, 1.0)
+                    initialVolume = max(initialVolume, 0.0)
+                    appVolume = initialVolume
+                    control_RightArea_Y = curPointY
+                }
+            }
+            break
+        default:
+            if isPanSeeking {
+                isPanSeeking = false
+                control_Area_X = 0.0
+                sliderTouchEnded()
+                seekingHandler(progressSlider.value)
+            } else {
+                // 亮度
+                if control_leftArea_Y != 0 {
+                    control_leftArea_Y = 0.0
+                    hudView.hide()
+                }
+                // 音量
+                control_RightArea_Y = 0.0
+            }
+            break
+        }
+    }
     /// 播放/暂停
+    @objc fileprivate func actionPlayOrPause() {
+        actionPlay(playBtn)
+    }
     @objc fileprivate func actionPlay(_ btn : UIButton) {
         btn.isSelected = !btn.isSelected
+        if !btn.isSelected {
+            player.pause()
+        } else {
+            player.start()
+        }
         if let delegate = delegate {
             delegate.playerViewPlayAction(btn)
+        }
+    }
+    /// 重播
+    @objc fileprivate func actionReplay(_ btn : UIButton) {
+        if let delegate = delegate {
+            delegate.playerViewReplayAction(self)
         }
     }
     /// 全屏
@@ -655,13 +894,243 @@ extension MTPlayerView {
             }
         }
         btn.isSelected = true
+        player.rate = Float(MTVideoRates[btn.tag].replacingOccurrences(of: "x", with: "")) ?? 1.0
         if let delegate = delegate {
             delegate.playerViewRateAction(btn.tag)
         }
         actionShowHalfBoard(nil)
     }
-}
+    /// 刷新UI
+    @objc fileprivate func refresh(_ curTime : TimeInterval) {
+//        let curTime = player.currentTime()
+        totalTime = duration
+        var progress : Float = Float(curTime / totalTime)
+        if progress > 1.0 {
+            progress = 1.0
+        } else if progress < 0.0 {
+            progress = 0.0
+        }
+//        if playBtn.isSelected != player.isPlaying() {
+//            playBtn.isSelected = player.isPlaying()
+//        }
+        //
+        let totalTimeStr = formatDuration(totalTime)
+        if curTime > 0 && totalTime > 0 {
+            if isDraging {
+                let curTimeWithDragged = Double(progressSlider.value) * totalTime
+                timeLb.text = formatDuration(curTimeWithDragged) + " / " + totalTimeStr
+            } else {
+                timeLb.text = formatDuration(curTime) + " / " + totalTimeStr
+                self.progress = CGFloat(progress)
+            }
+        } else {
+            timeLb.text = "--:-- / --:--"
+            self.progress = 0.0
+        }
+        //
+        if isHUDLoading && isPlaying {
+            hudView.hide()
+        }
 
+    }
+    func showLoadingHUD() {
+        hudView.showLoadingHUD()
+    }
+}
+// MARK: 播放器
+extension MTPlayerView: AVPDelegate {
+    func initialPlayer() {
+        player = AliListPlayer.init()
+        player.isLoop = false
+        player.scalingMode = AVP_SCALINGMODE_SCALEASPECTFIT
+        player.isAutoPlay = false
+        player.enableLog = false
+        player.isMuted = false
+        player.delegate = self
+        player.enableHardwareDecoder = true
+        // config
+        if let config = player.getConfig() {
+            config.maxDelayTime = 5000
+            config.maxBufferDuration = 30000
+            config.highBufferDuration = 3000
+            config.startBufferDuration = 500
+            config.networkTimeout = 5000
+            config.networkRetryCount = 3
+            player.setConfig(config)
+        }
+        // cache
+        let cacheConfig = AVPCacheConfig.init()
+        cacheConfig.enable = true
+        cacheConfig.maxDuration = 120*60
+        var isDir = ObjCBool.init(true)
+        let cachePath = kDocumentFolder + "/CC_TempVideo"
+        if !FileManager.default.fileExists(atPath: cachePath, isDirectory: &isDir) {
+            do {
+                try FileManager.default.createDirectory(atPath: cachePath, withIntermediateDirectories: true, attributes: nil)
+            } catch {}
+        }
+        cacheConfig.path = cachePath
+        cacheConfig.maxSizeMB = 600
+        player.setCacheConfig(cacheConfig)
+        
+    }
+    
+    func loadStudio(_ models : [CModel]) {
+        self.models = models
+        // 列表播放方式, 只支持非hls流
+//        models.forEach { (model) in
+//            player.addUrlSource(model.urlStr, uid: model.name)
+//        }
+//        player.prepare()
+//        if let lastStudio = UserDefaults.standard.object(forKey: "last_studio") as? String, !isSpaceNULLString(lastStudio) {
+//            player.move(to: lastStudio)
+//        } else {
+//            player.move(to: models.first!.name)
+//        }
+        // 点播方式
+        if let lastStudio = UserDefaults.standard.object(forKey: "last_studio") as? String, !isSpaceNULLString(lastStudio) {
+            moveTo(lastStudio)
+        } else {
+            moveTo(models.first!.name)
+        }
+        player.playerView = videoContainerView
+    }
+
+    func seekToTime(_ seconds : Int) {
+            if seconds < 3 { return }
+            player.seek(toTime: Int64(seconds * 1000), seekMode: AVP_SEEKMODE_INACCURATE)
+            showLoadingHUD()
+    }
+    func onPlayerEvent(_ player: AliPlayer!, eventType: AVPEventType) {
+        switch eventType {
+        case AVPEventPrepareDone:   // 准备完成
+            if let currentVideoInfo = player.getCurrentTrack(AVPTRACK_TYPE_VIDEO), let tracks = player.getMediaInfo()?.tracks {
+                tracks.forEach { (info) in
+                    print("码率索引==\(info.trackIndex), bit==\(info.trackBitrate), 画面高度==\(info.videoHeight)/n")
+                }
+                print("当前画面高度==\(currentVideoInfo.videoHeight)")
+            }
+            hudView.showLoadingHUD()
+            player.start()
+            break
+        case AVPEventLoadingStart:  // 加载开始
+            hudView.showLoadingHUD()
+            break
+        case AVPEventLoadingEnd:    // 加载完成
+            SVProgressHUD.dismiss()
+            break
+        case AVPEventSeekEnd:   // 跳转完成
+            SVProgressHUD.dismiss()
+            break
+        case AVPEventCompletion: // 播放完成
+//            if let lastVod = models.last {
+//                if self.player.currentUid() == lastVod.name {
+//                    self.isShowReplayView = true
+//                } else {
+//                    self.player.moveToNext()
+//                }
+//            }
+            moveToNext()
+            break
+        default:
+            break
+        }
+    }
+    func onPlayerStatusChanged(_ player: AliPlayer!, oldStatus: AVPStatus, newStatus: AVPStatus) {
+//        /** @brief 空转，闲时，静态 */
+//        AVPStatusIdle = 0,
+//        /** @brief 初始化完成 */
+//        AVPStatusInitialzed,
+//        /** @brief 准备完成 */
+//        AVPStatusPrepared,
+//        /** @brief 正在播放 */
+//        AVPStatusStarted,
+//        /** @brief 播放暂停 */
+//        AVPStatusPaused,
+//        /** @brief 播放停止 */
+//        AVPStatusStopped,
+//        /** @brief 播放完成 */
+//        AVPStatusCompletion,
+//        /** @brief 播放错误 */
+//        AVPStatusError
+        playerState = newStatus
+        switch newStatus {
+        case AVPStatusStarted:
+            playBtn.isSelected = true
+            break
+        case AVPStatusPaused,AVPStatusStopped:
+            playBtn.isSelected = false
+            break
+        case AVPStatusError:
+            playBtn.isSelected = false
+            timeLb.text = "--:-- / --:--"
+            progressSlider.value = 0.0
+            break
+        case AVPStatusInitialzed:
+            break
+        default:
+            break
+        }
+    }
+    func onError(_ player: AliPlayer!, errorModel: AVPErrorModel!) {
+        appearMenus(true)
+        hudView.showFailureHUD(errorModel.message)
+        //
+    }
+    func onTrackChanged(_ player: AliPlayer!, info: AVPTrackInfo!) {
+        switch info.trackType {
+        case AVPTRACK_TYPE_VIDEO:
+            SVProgressHUD.showInfo(withStatus: "清晰度切换完成")
+            break
+        default:
+            break
+        }
+    }
+    func onCurrentPositionUpdate(_ player: AliPlayer!, position: Int64) {
+        refresh(TimeInterval(position/1000))
+    }
+    func onPlayerEvent(_ player: AliPlayer!, eventWithString: AVPEventWithString, description: String!) {
+        if eventWithString == EVENT_PLAYER_CACHE_SUCCESS {
+            print("缓存成功")
+        }
+        if eventWithString == EVENT_SWITCH_TO_SOFTWARE_DECODER {
+            print("已切换为软解")
+        }
+    }
+    
+    func moveTo(_ videoID : String) {
+        if let m = models.filter({$0.name == videoID}).first {
+            curModel = m
+            if let delegate = delegate, let idx = models.firstIndex(of: m) {
+                delegate.playerViewCurrentPlay(idx)
+            }
+            
+            let source = AVPUrlSource.init()
+            source.playerUrl = URL.init(string: m.urlStr)
+            player.setUrlSource(source)
+            showLoadingHUD()
+            player.prepare()
+        }
+    }
+    fileprivate func moveToNext() {
+        if curModel != nil, var curIdx = models.firstIndex(of: curModel) {
+            if curIdx+1 >= models.count {
+                curIdx = 0
+            } else {
+                curIdx += 1
+            }
+            if let delegate = delegate {
+                delegate.playerViewCurrentPlay(curIdx)
+            }
+            let source = AVPUrlSource.init()
+            source.playerUrl = URL.init(string: models[curIdx].urlStr)
+            player.setUrlSource(source)
+            showLoadingHUD()
+            player.prepare()
+        }
+    }
+    
+}
 // MARK: slider
 class MTSmartSlider: UISlider {
     var trackHeight : CGFloat = 0.0
@@ -685,15 +1154,20 @@ class MTSmartHUDView : UIView {
     var seekingProgressView : UIProgressView!
     var seekingTimeLb : UILabel!
     var failureLb : UILabel!
+    var isInteractionEnabled : Bool = true
+    var isVisableHUD : Bool = true {
+        didSet {
+            if isVisableHUD {
+                SVProgressHUD.setContainerView(self)
+            } else {
+                SVProgressHUD.setContainerView(nil)
+            }
+        }
+    }
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.isHidden = true
         self.alpha = 0.0
-        SVProgressHUD.setMaxSupportedWindowLevel(UIWindow.Level.statusBar)
-        SVProgressHUD.setDefaultStyle(.custom)
-        SVProgressHUD.setDefaultMaskType(.none)
-        SVProgressHUD.setBackgroundColor(UIColor.init("#333333db"))
-        SVProgressHUD.setForegroundColor(.white)
         //
         self.backgroundColor = UIColor.black.withAlphaComponent(0.3)
         seekingProgressView = UIProgressView()
@@ -731,29 +1205,49 @@ class MTSmartHUDView : UIView {
     func showSeekingHUD(_ value : Float, second : TimeInterval) {
         self.alpha = 1.0
         self.isHidden = false
+        isInteractionEnabled = true
         SVProgressHUD.dismiss()
         failureLb.isHidden = true
         seekingTimeLb.isHidden = false
         seekingProgressView.isHidden = false
         seekingProgressView.progress = value
-        seekingTimeLb.text = formatDuration(second)
+        seekingTimeLb.text = formatDuration(Double(value)*second)
         seekingTimeLb.sizeToFit()
     }
-    func showLoadingHUD(_ isShow : Bool) {
+    func showLoadingHUD() {
+        if self.isHidden == false && SVProgressHUD.isVisible() { return }
         self.isHidden = false
         UIView.animate(withDuration: 0.25) {
             self.alpha = 1.0
         }
-        SVProgressHUD.show(withStatus: "Loading...")
+        isInteractionEnabled = false
+        if isVisableHUD {
+            SVProgressHUD.show(withStatus: "Loading...")
+        }
         failureLb.isHidden = true
         seekingTimeLb.isHidden = true
         seekingProgressView.isHidden = true
+    }
+    func showBrightNess(_ progress : Float) {
+        self.isHidden = false
+        UIView.animate(withDuration: 0.25) {
+            self.alpha = 1.0
+        }
+        isInteractionEnabled = true
+        if isVisableHUD {
+            SVProgressHUD.showProgress(progress, status: "亮度")
+        }
+        failureLb.isHidden = true
+        seekingTimeLb.isHidden = true
+        seekingProgressView.isHidden = true
+        UIScreen.main.brightness = CGFloat(progress)
     }
     func showFailureHUD(_ str : String) {
         self.isHidden = false
         UIView.animate(withDuration: 0.25) {
             self.alpha = 1.0
         }
+        isInteractionEnabled = false
         failureLb.isHidden = false
         failureLb.text = str
         SVProgressHUD.dismiss()
@@ -761,11 +1255,13 @@ class MTSmartHUDView : UIView {
         seekingProgressView.isHidden = true
     }
     func hide() {
+        isInteractionEnabled = true
         SVProgressHUD.dismiss()
+        if self.isHidden { return }
         failureLb.isHidden = true
         seekingTimeLb.isHidden = true
         seekingProgressView.isHidden = true
-        UIView.animate(withDuration: 0.25, animations: {
+        UIView.animate(withDuration: 0.15, animations: {
             self.alpha = 0.0
         }) { (completion) in
             self.isHidden = true
@@ -780,3 +1276,31 @@ class MTSmartHUDView : UIView {
     }
 }
 
+class SparkMPVolumnView: MPVolumeView {
+    weak var MPButton : UIButton?
+    override init(frame: CGRect) {
+        super.init(frame: .zero)
+        self.backgroundColor = .clear
+        self.showsVolumeSlider = false
+        self.tag = 2233
+        self.initialMPButton()
+    }
+    
+    fileprivate func initialMPButton() {
+        self.subviews.forEach { (subV) in
+            if subV.isKind(of: UIButton.self) {
+                MPButton = subV as? UIButton
+            }
+        }
+        if let btn = MPButton {
+            btn.setImage(nil, for: .normal)
+            btn.setImage(nil, for: .highlighted)
+            btn.setImage(nil, for: .selected)
+            btn.bounds = CGRect.zero
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
