@@ -70,7 +70,7 @@ class MTVideoRoomController: UIBaseViewController {
         btn.addTarget(self, action: #selector(replayAction(_:)), for: .touchUpInside)
         return btn
     }()
-    fileprivate lazy var playerView : MTPlayerView = MTPlayerView()
+    lazy var playerView : MTPlayerView = MTPlayerView()
     fileprivate var toolRateBtn : UIButton!
     fileprivate var toolQualityBtn : UIButton!
     fileprivate var toolAudioBtn : UIButton!
@@ -103,10 +103,10 @@ class MTVideoRoomController: UIBaseViewController {
         return tableV
     }()
     fileprivate lazy var models = [CModel]()
+    fileprivate lazy var board = AirPlayBoard.loadNib()
     // MARK: private properties
     fileprivate var isPortrait : Bool = true
     fileprivate var isForcePortrait : Bool = false
-    fileprivate var volumnV = SparkMPVolumnView.init()
     // MARK: Main
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -130,16 +130,17 @@ class MTVideoRoomController: UIBaseViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(exitApp), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(exitApp), name: UIApplication.willTerminateNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(activateApp), name: UIApplication.didBecomeActiveNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(audioRouteHasChangedNotification), name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
     }
     // 记录最后一次播放位置
     @objc fileprivate func exitApp() {
-        if !isSpaceNULLString(playerView.player.currentUid()) {
-            UserDefaults.standard.set(playerView.player.currentUid(), forKey: "last_studio")
+        UIApplication.shared.isIdleTimerDisabled = false
+        if playerView.curModel != nil {
+            UserDefaults.standard.set(playerView.curModel.name, forKey: "last_studio")
             UserDefaults.standard.synchronize()
         }
     }
     @objc fileprivate func activateApp() {
+        UIApplication.shared.isIdleTimerDisabled = true
         let session = AVAudioSession.sharedInstance()
         do {
             try _ = session.setCategory(.playback)
@@ -147,24 +148,7 @@ class MTVideoRoomController: UIBaseViewController {
             SVProgressHUD.showError(withStatus: "激活媒体失败")
         }
     }
-    // airplay 是否断开
-    @objc fileprivate func audioRouteHasChangedNotification() {
-        let isAirPlay = !isSpaceNULLString(self.activeAirplayOutputRouteName())
-        if !isAirPlay {
-            SVProgressHUD.showError(withStatus: "AirPlay已断开")
-        }
-    }
-    fileprivate func activeAirplayOutputRouteName() -> String? {
-        let audioSession = AVAudioSession.sharedInstance()
-        let currentRoute = audioSession.currentRoute
-        var name : String?
-        currentRoute.outputs.forEach { (outputPort) in
-            if outputPort.portType == AVAudioSession.Port.airPlay{
-                name = outputPort.portName
-            }
-        }
-        return name
-    }
+    
 
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -181,7 +165,8 @@ extension MTVideoRoomController {
         view.addSubview(playerToolBar)
         view.addSubview(replayContainer)
         view.addSubview(tableView)
-        view.addSubview(volumnV)
+        view.addSubview(board)
+        board.isHidden = true
         setupToolBar()
         // layout
         setupLayout()
@@ -397,8 +382,16 @@ extension MTVideoRoomController: MTPlayerViewDelegate {
     // 投屏
     func playerViewMoreAction(_ playerV: MTPlayerView) {
         playerView.player.pause()
-        if let btn = self.volumnV.MPButton {
-            btn.sendActions(for: .touchUpInside)
+        playerView.hudFree(true)
+        board.isHidden = false
+        board.actionSearchDevice()
+        board.closeHandler = {[weak self] in
+            self?.playerView.hudFree(false)
+            if let _ = self?.board.connectDevice {
+                
+            } else {
+//                self?.playerView.player.start()
+            }
         }
     }
     // 全屏

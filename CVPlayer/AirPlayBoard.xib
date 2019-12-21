@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="AirPlayBoard" customModule="CVPlayer" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eKl-f2-6hh">
+                    <rect key="frame" x="20" y="150" width="335" height="367"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="请选择投屏设备" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ENA-aA-MyL">
+                            <rect key="frame" x="106.5" y="15" width="122" height="21"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="gMH-jC-kSJ">
+                            <rect key="frame" x="15" y="56" width="305" height="266"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </tableView>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Fy-L7-irV">
+                            <rect key="frame" x="0.0" y="322" width="335" height="45"/>
+                            <color key="backgroundColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="断开当前设备"/>
+                            <connections>
+                                <action selector="actionBreakOut:" destination="iN0-l3-epB" eventType="touchUpInside" id="lWy-K2-prH"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" red="0.96078431372549022" green="0.96078431372549022" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstItem="ENA-aA-MyL" firstAttribute="centerX" secondItem="eKl-f2-6hh" secondAttribute="centerX" id="6b9-Of-Y3i"/>
+                        <constraint firstItem="ENA-aA-MyL" firstAttribute="top" secondItem="eKl-f2-6hh" secondAttribute="top" constant="15" id="6lT-Td-5fh"/>
+                        <constraint firstAttribute="trailing" secondItem="gMH-jC-kSJ" secondAttribute="trailing" constant="15" id="Bvu-4k-OKp"/>
+                        <constraint firstItem="gMH-jC-kSJ" firstAttribute="top" secondItem="ENA-aA-MyL" secondAttribute="bottom" constant="20" id="D9A-9f-jOA"/>
+                        <constraint firstAttribute="bottom" secondItem="4Fy-L7-irV" secondAttribute="bottom" id="Uwn-wi-Ub3"/>
+                        <constraint firstItem="4Fy-L7-irV" firstAttribute="top" secondItem="gMH-jC-kSJ" secondAttribute="bottom" id="Yes-Xg-e7I"/>
+                        <constraint firstAttribute="trailing" secondItem="4Fy-L7-irV" secondAttribute="trailing" id="bSj-LP-1AF"/>
+                        <constraint firstItem="gMH-jC-kSJ" firstAttribute="leading" secondItem="eKl-f2-6hh" secondAttribute="leading" constant="15" id="fXC-vs-0xP"/>
+                        <constraint firstItem="4Fy-L7-irV" firstAttribute="leading" secondItem="eKl-f2-6hh" secondAttribute="leading" id="hFv-vR-acg"/>
+                        <constraint firstAttribute="bottom" secondItem="gMH-jC-kSJ" secondAttribute="bottom" constant="45" id="i3Z-Gs-8rT"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="string" keyPath="layer.cornerRadius" value="10"/>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                    </userDefinedRuntimeAttributes>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="eKl-f2-6hh" secondAttribute="trailing" constant="20" id="INm-5w-uTV"/>
+                <constraint firstAttribute="bottom" secondItem="eKl-f2-6hh" secondAttribute="bottom" constant="150" id="XZE-71-x7x"/>
+                <constraint firstItem="eKl-f2-6hh" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="20" id="o3G-4n-y18"/>
+                <constraint firstItem="eKl-f2-6hh" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="150" id="vA3-8t-5xK"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <connections>
+                <outlet property="holdView" destination="eKl-f2-6hh" id="TRY-xb-TuH"/>
+                <outlet property="tableView" destination="gMH-jC-kSJ" id="KcQ-Iu-wNy"/>
+            </connections>
+            <point key="canvasLocation" x="136.80000000000001" y="271.21439280359823"/>
+        </view>
+    </objects>
+</document>

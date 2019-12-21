@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		524EF12A23ADC352007618B0 /* AirPlayBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524EF12923ADC352007618B0 /* AirPlayBoard.swift */; };
+		524EF12C23ADC35E007618B0 /* AirPlayBoard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 524EF12B23ADC35E007618B0 /* AirPlayBoard.xib */; };
+		524EF13423ADC7AE007618B0 /* MYCAirplayDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 524EF12F23ADC7AD007618B0 /* MYCAirplayDevice.m */; };
+		524EF13523ADC7AE007618B0 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 524EF13023ADC7AD007618B0 /* GCDAsyncSocket.m */; };
+		524EF13623ADC7AE007618B0 /* MYCAirplayManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 524EF13123ADC7AE007618B0 /* MYCAirplayManager.m */; };
+		524EF13823ADCF33007618B0 /* Nibloadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524EF13723ADCF33007618B0 /* Nibloadable.swift */; };
 		7493FA8523AC69B400DD5A0B /* MTVideoRoomController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493FA8323AC69B400DD5A0B /* MTVideoRoomController.swift */; };
 		7493FA8623AC69B400DD5A0B /* MTPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493FA8423AC69B400DD5A0B /* MTPlayerView.swift */; };
 		7493FA8823AC69F800DD5A0B /* MTGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493FA8723AC69F800DD5A0B /* MTGeneral.swift */; };
@@ -46,6 +52,15 @@
 /* Begin PBXFileReference section */
 		1AD2B6986C54707CA0C5D549 /* Pods_CVPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CVPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36903757E0E0F3378F525E2B /* Pods-CVPlayer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CVPlayer.release.xcconfig"; path = "Target Support Files/Pods-CVPlayer/Pods-CVPlayer.release.xcconfig"; sourceTree = "<group>"; };
+		524EF12923ADC352007618B0 /* AirPlayBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirPlayBoard.swift; sourceTree = "<group>"; };
+		524EF12B23ADC35E007618B0 /* AirPlayBoard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AirPlayBoard.xib; sourceTree = "<group>"; };
+		524EF12E23ADC7AD007618B0 /* MYCAirplayManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MYCAirplayManager.h; sourceTree = "<group>"; };
+		524EF12F23ADC7AD007618B0 /* MYCAirplayDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MYCAirplayDevice.m; sourceTree = "<group>"; };
+		524EF13023ADC7AD007618B0 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
+		524EF13123ADC7AE007618B0 /* MYCAirplayManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MYCAirplayManager.m; sourceTree = "<group>"; };
+		524EF13223ADC7AE007618B0 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
+		524EF13323ADC7AE007618B0 /* MYCAirplayDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MYCAirplayDevice.h; sourceTree = "<group>"; };
+		524EF13723ADCF33007618B0 /* Nibloadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Nibloadable.swift; sourceTree = "<group>"; };
 		7493FA8323AC69B400DD5A0B /* MTVideoRoomController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTVideoRoomController.swift; sourceTree = "<group>"; };
 		7493FA8423AC69B400DD5A0B /* MTPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTPlayerView.swift; sourceTree = "<group>"; };
 		7493FA8723AC69F800DD5A0B /* MTGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTGeneral.swift; sourceTree = "<group>"; };
@@ -81,6 +96,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		524EF12D23ADC79F007618B0 /* AirPlay */ = {
+			isa = PBXGroup;
+			children = (
+				524EF12E23ADC7AD007618B0 /* MYCAirplayManager.h */,
+				524EF13123ADC7AE007618B0 /* MYCAirplayManager.m */,
+				524EF13323ADC7AE007618B0 /* MYCAirplayDevice.h */,
+				524EF12F23ADC7AD007618B0 /* MYCAirplayDevice.m */,
+				524EF13223ADC7AE007618B0 /* GCDAsyncSocket.h */,
+				524EF13023ADC7AD007618B0 /* GCDAsyncSocket.m */,
+			);
+			path = AirPlay;
+			sourceTree = "<group>";
+		};
 		7144B9DE94985A12422866C9 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -93,6 +121,7 @@
 		7493FA8B23AC6AEE00DD5A0B /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				524EF13723ADCF33007618B0 /* Nibloadable.swift */,
 				7493FA8923AC6A4600DD5A0B /* SubstringExtension.swift */,
 				7493FA8723AC69F800DD5A0B /* MTGeneral.swift */,
 				7493FA8D23AC6B4700DD5A0B /* AlivcConan.framework */,
@@ -123,12 +152,15 @@
 		74D51292230259CE000B1061 /* CVPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				524EF12D23ADC79F007618B0 /* AirPlay */,
 				7493FA8B23AC6AEE00DD5A0B /* Lib */,
 				74D51293230259CE000B1061 /* AppDelegate.swift */,
 				74D51295230259CE000B1061 /* ViewController.swift */,
 				7493FA9F23AC8CB000DD5A0B /* UIBaseNavigationController.swift */,
 				7493FA9923AC6D7300DD5A0B /* UIBaseViewController.swift */,
 				7493FA8323AC69B400DD5A0B /* MTVideoRoomController.swift */,
+				524EF12923ADC352007618B0 /* AirPlayBoard.swift */,
+				524EF12B23ADC35E007618B0 /* AirPlayBoard.xib */,
 				7493FA8423AC69B400DD5A0B /* MTPlayerView.swift */,
 				74D51297230259CE000B1061 /* Main.storyboard */,
 				74D5129A230259D0000B1061 /* Assets.xcassets */,
@@ -212,6 +244,7 @@
 				74D5129E230259D0000B1061 /* LaunchScreen.storyboard in Resources */,
 				74D5129B230259D0000B1061 /* Assets.xcassets in Resources */,
 				74D51299230259CE000B1061 /* Main.storyboard in Resources */,
+				524EF12C23ADC35E007618B0 /* AirPlayBoard.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,11 +324,16 @@
 			files = (
 				7493FAA023AC8CB000DD5A0B /* UIBaseNavigationController.swift in Sources */,
 				74D51296230259CE000B1061 /* ViewController.swift in Sources */,
+				524EF13823ADCF33007618B0 /* Nibloadable.swift in Sources */,
+				524EF13423ADC7AE007618B0 /* MYCAirplayDevice.m in Sources */,
 				7493FA8A23AC6A4600DD5A0B /* SubstringExtension.swift in Sources */,
 				7493FA8523AC69B400DD5A0B /* MTVideoRoomController.swift in Sources */,
+				524EF12A23ADC352007618B0 /* AirPlayBoard.swift in Sources */,
 				7493FA9A23AC6D7300DD5A0B /* UIBaseViewController.swift in Sources */,
 				7493FA8623AC69B400DD5A0B /* MTPlayerView.swift in Sources */,
+				524EF13623ADC7AE007618B0 /* MYCAirplayManager.m in Sources */,
 				74D51294230259CE000B1061 /* AppDelegate.swift in Sources */,
+				524EF13523ADC7AE007618B0 /* GCDAsyncSocket.m in Sources */,
 				7493FA8823AC69F800DD5A0B /* MTGeneral.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

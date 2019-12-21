@@ -447,7 +447,7 @@ class MTPlayerView: UIView {
         return Float(player.currentPosition / player.duration)
     }
     fileprivate lazy var models = [CModel]()
-    fileprivate var curModel : CModel!
+    var curModel : CModel!
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .black
@@ -627,6 +627,10 @@ class MTPlayerView: UIView {
         if let vS = volumeSlider, vS.value > 0 {
             initialVolume = vS.value
         }
+    }
+    // 释放弹窗
+    func hudFree(_ isFree : Bool) {
+        hudView.isVisableHUD = !isFree
     }
 
 }
@@ -1157,6 +1161,7 @@ class MTSmartHUDView : UIView {
     var isInteractionEnabled : Bool = true
     var isVisableHUD : Bool = true {
         didSet {
+            SVProgressHUD.setMinimumDismissTimeInterval(2)
             if isVisableHUD {
                 SVProgressHUD.setContainerView(self)
             } else {
