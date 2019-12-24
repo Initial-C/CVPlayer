@@ -234,7 +234,7 @@ class MTPlayerView: UIView {
     }()
     fileprivate lazy var titleLb : UILabel = {
         let lb = UILabel()
-        lb.text = "庆余年"
+        lb.text = "Eromanga"
         lb.textColor = .white
         lb.font = UIFont(name: kMediumFont, size: 15)
         lb.isHidden = true
