@@ -102,6 +102,7 @@ extension AirPlayBoard : MYCAirplayManagerDelegate {
         SVProgressHUD.showInfo(withStatus: "设备已断开")
     }
     func hiddenBoard() {
+        SVProgressHUD.dismiss()
         self.isHidden = true
         if let handler = closeHandler {
             handler()
