@@ -948,7 +948,7 @@ extension MTPlayerView: AVPDelegate {
         player.isLoop = false
         player.scalingMode = AVP_SCALINGMODE_SCALEASPECTFIT
         player.isAutoPlay = false
-        player.enableLog = false
+        AliListPlayer.setEnableLog(false)
         player.isMuted = false
         player.delegate = self
         player.enableHardwareDecoder = true

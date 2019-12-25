@@ -17,14 +17,14 @@
 		7493FA8623AC69B400DD5A0B /* MTPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493FA8423AC69B400DD5A0B /* MTPlayerView.swift */; };
 		7493FA8823AC69F800DD5A0B /* MTGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493FA8723AC69F800DD5A0B /* MTGeneral.swift */; };
 		7493FA8A23AC6A4600DD5A0B /* SubstringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493FA8923AC6A4600DD5A0B /* SubstringExtension.swift */; };
-		7493FA9223AC6B6800DD5A0B /* AlivcConan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7493FA8D23AC6B4700DD5A0B /* AlivcConan.framework */; };
-		7493FA9323AC6B6800DD5A0B /* AlivcConan.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7493FA8D23AC6B4700DD5A0B /* AlivcConan.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7493FA9423AC6B6800DD5A0B /* alivcffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7493FA8C23AC6B4700DD5A0B /* alivcffmpeg.framework */; };
-		7493FA9523AC6B6800DD5A0B /* alivcffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7493FA8C23AC6B4700DD5A0B /* alivcffmpeg.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7493FA9623AC6B6800DD5A0B /* AliyunPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7493FA8E23AC6B4800DD5A0B /* AliyunPlayer.framework */; };
-		7493FA9723AC6B6800DD5A0B /* AliyunPlayer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7493FA8E23AC6B4800DD5A0B /* AliyunPlayer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7493FA9A23AC6D7300DD5A0B /* UIBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493FA9923AC6D7300DD5A0B /* UIBaseViewController.swift */; };
 		7493FAA023AC8CB000DD5A0B /* UIBaseNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493FA9F23AC8CB000DD5A0B /* UIBaseNavigationController.swift */; };
+		74CA942423B341BE00891DE2 /* AlivcConan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74CA941F23B340F500891DE2 /* AlivcConan.framework */; };
+		74CA942523B341BE00891DE2 /* AlivcConan.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 74CA941F23B340F500891DE2 /* AlivcConan.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		74CA942623B341BE00891DE2 /* alivcffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74CA941E23B340F500891DE2 /* alivcffmpeg.framework */; };
+		74CA942723B341BE00891DE2 /* alivcffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 74CA941E23B340F500891DE2 /* alivcffmpeg.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		74CA942823B341BE00891DE2 /* AliyunPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74CA942023B340F500891DE2 /* AliyunPlayer.framework */; };
+		74CA942923B341BE00891DE2 /* AliyunPlayer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 74CA942023B340F500891DE2 /* AliyunPlayer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		74D51294230259CE000B1061 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D51293230259CE000B1061 /* AppDelegate.swift */; };
 		74D51296230259CE000B1061 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D51295230259CE000B1061 /* ViewController.swift */; };
 		74D51299230259CE000B1061 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74D51297230259CE000B1061 /* Main.storyboard */; };
@@ -40,9 +40,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				7493FA9323AC6B6800DD5A0B /* AlivcConan.framework in Embed Frameworks */,
-				7493FA9523AC6B6800DD5A0B /* alivcffmpeg.framework in Embed Frameworks */,
-				7493FA9723AC6B6800DD5A0B /* AliyunPlayer.framework in Embed Frameworks */,
+				74CA942523B341BE00891DE2 /* AlivcConan.framework in Embed Frameworks */,
+				74CA942723B341BE00891DE2 /* alivcffmpeg.framework in Embed Frameworks */,
+				74CA942923B341BE00891DE2 /* AliyunPlayer.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -65,12 +65,12 @@
 		7493FA8423AC69B400DD5A0B /* MTPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTPlayerView.swift; sourceTree = "<group>"; };
 		7493FA8723AC69F800DD5A0B /* MTGeneral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTGeneral.swift; sourceTree = "<group>"; };
 		7493FA8923AC6A4600DD5A0B /* SubstringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubstringExtension.swift; sourceTree = "<group>"; };
-		7493FA8C23AC6B4700DD5A0B /* alivcffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = alivcffmpeg.framework; sourceTree = "<group>"; };
-		7493FA8D23AC6B4700DD5A0B /* AlivcConan.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AlivcConan.framework; sourceTree = "<group>"; };
-		7493FA8E23AC6B4800DD5A0B /* AliyunPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AliyunPlayer.framework; sourceTree = "<group>"; };
 		7493FA9923AC6D7300DD5A0B /* UIBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBaseViewController.swift; sourceTree = "<group>"; };
 		7493FA9B23AC7C3D00DD5A0B /* CVPlayer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CVPlayer-Bridging-Header.h"; sourceTree = "<group>"; };
 		7493FA9F23AC8CB000DD5A0B /* UIBaseNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBaseNavigationController.swift; sourceTree = "<group>"; };
+		74CA941E23B340F500891DE2 /* alivcffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = alivcffmpeg.framework; sourceTree = "<group>"; };
+		74CA941F23B340F500891DE2 /* AlivcConan.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AlivcConan.framework; sourceTree = "<group>"; };
+		74CA942023B340F500891DE2 /* AliyunPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AliyunPlayer.framework; sourceTree = "<group>"; };
 		74D51290230259CE000B1061 /* CVPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CVPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74D51293230259CE000B1061 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		74D51295230259CE000B1061 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -86,9 +86,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7493FA9423AC6B6800DD5A0B /* alivcffmpeg.framework in Frameworks */,
-				7493FA9623AC6B6800DD5A0B /* AliyunPlayer.framework in Frameworks */,
-				7493FA9223AC6B6800DD5A0B /* AlivcConan.framework in Frameworks */,
+				74CA942623B341BE00891DE2 /* alivcffmpeg.framework in Frameworks */,
+				74CA942823B341BE00891DE2 /* AliyunPlayer.framework in Frameworks */,
+				74CA942423B341BE00891DE2 /* AlivcConan.framework in Frameworks */,
 				8CAB2C79720B1221328447BD /* Pods_CVPlayer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -121,12 +121,12 @@
 		7493FA8B23AC6AEE00DD5A0B /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				74CA941F23B340F500891DE2 /* AlivcConan.framework */,
+				74CA941E23B340F500891DE2 /* alivcffmpeg.framework */,
+				74CA942023B340F500891DE2 /* AliyunPlayer.framework */,
 				524EF13723ADCF33007618B0 /* Nibloadable.swift */,
 				7493FA8923AC6A4600DD5A0B /* SubstringExtension.swift */,
 				7493FA8723AC69F800DD5A0B /* MTGeneral.swift */,
-				7493FA8D23AC6B4700DD5A0B /* AlivcConan.framework */,
-				7493FA8C23AC6B4700DD5A0B /* alivcffmpeg.framework */,
-				7493FA8E23AC6B4800DD5A0B /* AliyunPlayer.framework */,
 			);
 			path = Lib;
 			sourceTree = "<group>";
