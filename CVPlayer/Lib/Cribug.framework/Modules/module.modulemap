@@ -1,0 +1,11 @@
+framework module Cribug {
+  umbrella header "Cribug.h"
+
+  export *
+  module * { export * }
+}
+
+module Cribug.Swift {
+    header "Cribug-Swift.h"
+    requires objc
+}

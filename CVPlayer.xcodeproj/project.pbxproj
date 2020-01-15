@@ -19,6 +19,7 @@
 		7493FA8A23AC6A4600DD5A0B /* SubstringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493FA8923AC6A4600DD5A0B /* SubstringExtension.swift */; };
 		7493FA9A23AC6D7300DD5A0B /* UIBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493FA9923AC6D7300DD5A0B /* UIBaseViewController.swift */; };
 		7493FAA023AC8CB000DD5A0B /* UIBaseNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493FA9F23AC8CB000DD5A0B /* UIBaseNavigationController.swift */; };
+		74C7F64A23CEF7240084CD9A /* Cribug.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74C7F64923CEF7240084CD9A /* Cribug.framework */; };
 		74CA942423B341BE00891DE2 /* AlivcConan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74CA941F23B340F500891DE2 /* AlivcConan.framework */; };
 		74CA942523B341BE00891DE2 /* AlivcConan.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 74CA941F23B340F500891DE2 /* AlivcConan.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		74CA942623B341BE00891DE2 /* alivcffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74CA941E23B340F500891DE2 /* alivcffmpeg.framework */; };
@@ -68,6 +69,7 @@
 		7493FA9923AC6D7300DD5A0B /* UIBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBaseViewController.swift; sourceTree = "<group>"; };
 		7493FA9B23AC7C3D00DD5A0B /* CVPlayer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CVPlayer-Bridging-Header.h"; sourceTree = "<group>"; };
 		7493FA9F23AC8CB000DD5A0B /* UIBaseNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBaseNavigationController.swift; sourceTree = "<group>"; };
+		74C7F64923CEF7240084CD9A /* Cribug.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Cribug.framework; sourceTree = "<group>"; };
 		74CA941E23B340F500891DE2 /* alivcffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = alivcffmpeg.framework; sourceTree = "<group>"; };
 		74CA941F23B340F500891DE2 /* AlivcConan.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AlivcConan.framework; sourceTree = "<group>"; };
 		74CA942023B340F500891DE2 /* AliyunPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AliyunPlayer.framework; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 			files = (
 				74CA942623B341BE00891DE2 /* alivcffmpeg.framework in Frameworks */,
 				74CA942823B341BE00891DE2 /* AliyunPlayer.framework in Frameworks */,
+				74C7F64A23CEF7240084CD9A /* Cribug.framework in Frameworks */,
 				74CA942423B341BE00891DE2 /* AlivcConan.framework in Frameworks */,
 				8CAB2C79720B1221328447BD /* Pods_CVPlayer.framework in Frameworks */,
 			);
@@ -121,6 +124,7 @@
 		7493FA8B23AC6AEE00DD5A0B /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				74C7F64923CEF7240084CD9A /* Cribug.framework */,
 				74CA941F23B340F500891DE2 /* AlivcConan.framework */,
 				74CA941E23B340F500891DE2 /* alivcffmpeg.framework */,
 				74CA942023B340F500891DE2 /* AliyunPlayer.framework */,
